@@ -3,8 +3,8 @@ package flow
 import (
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/torrischen/workflow/logging"
+	"github.com/torrischen/workflow/pkg/util"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -33,10 +33,18 @@ func initMysql(user, password, host, port, dbname string) {
 	db.AutoMigrate(&Node{})
 	db.AutoMigrate(&NodeData{})
 	db.AutoMigrate(&PipelineRun{})
+
+	db.Callback().Create().Before("gorm:create").Register("add:uuid", addUUID)
+}
+
+func addUUID(db *gorm.DB) {
+	if _, ok := db.Statement.Schema.FieldsByName["ID"]; ok {
+		db.Statement.SetColumn("ID", util.Uuid())
+	}
 }
 
 type Base struct {
-	ID        uuid.UUID `gorm:"type:uuid;primary_key;"`
+	ID        string `gorm:"primaryKey;"`
 	CreatedAt int64
 	UpdatedAt int64
 	DeletedAt gorm.DeletedAt `gorm:"index"`
