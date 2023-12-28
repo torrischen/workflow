@@ -27,6 +27,12 @@ func initMysql(user, password, host, port, dbname string) {
 	}
 
 	db = _db
+
+	// Migrate the schema
+	db.AutoMigrate(&Pipeline{})
+	db.AutoMigrate(&Node{})
+	db.AutoMigrate(&NodeData{})
+	db.AutoMigrate(&PipelineRun{})
 }
 
 type Base struct {
