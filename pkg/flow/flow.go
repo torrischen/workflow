@@ -2,6 +2,7 @@ package flow
 
 import (
 	"context"
+	"errors"
 	"time"
 )
 
@@ -70,6 +71,33 @@ func (f *Flow) GetPipelineByID(id string, needNode, needPipelineRun bool) (*Pipe
 	return getPipelineByID(id, needNode, needPipelineRun)
 }
 
-func (f *Flow) UpdatePipeline(id string, data map[string]interface{}) error {
-	return updatePipeline(id, data)
+func (f *Flow) UpdatePipeline(id string, topic string, remark string) error {
+	return updatePipeline(id, map[string]interface{}{
+		"topic":  topic,
+		"remark": remark,
+	})
+}
+
+// DeletePipeline will delete the pipeline and all nodes in it.
+func (f *Flow) DeletePipeline(id string) error {
+	pipe, err := getPipelineByID(id, true, true)
+	if err != nil {
+		return err
+	}
+
+	if len(pipe.PipelineRun) > 0 {
+		return errors.New("pipeline has been run, cannot delete")
+	}
+
+	for _, node := range pipe.Node {
+		if err := deleteNode(node.ID); err != nil {
+			return err
+		}
+	}
+
+	if err := deletePipeline(id); err != nil {
+		return err
+	}
+
+	return nil
 }
