@@ -33,9 +33,20 @@ func deleteNodeData(id string) error {
 	return nil
 }
 
-func getNodeDataByID(id string) (*NodeData, error) {
+func getNodeDataByID(id string, needNode, needPipelineRun bool) (*NodeData, error) {
 	var nodeData NodeData
-	if err := db.Preload("PipelineRun").Preload("Node").First(&nodeData, id).Error; err != nil {
+
+	_db := db
+	if needNode {
+		_db = _db.Preload("Node")
+	}
+	if needPipelineRun {
+		_db = _db.Preload("PipelineRun")
+	}
+
+	if err := _db.
+		Where("id=?", id).
+		First(&nodeData).Error; err != nil {
 		return nil, err
 	}
 

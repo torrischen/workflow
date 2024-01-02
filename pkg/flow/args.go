@@ -11,3 +11,7 @@ type NodeArgs struct {
 	PipelineID string `json:"pipeline_id"`
 	Template   string `json:"template"`
 }
+
+type PipelineRunArgs struct {
+	PipelineID string
+}

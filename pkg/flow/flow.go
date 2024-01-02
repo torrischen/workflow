@@ -71,9 +71,14 @@ func (f *Flow) GetPipelineByID(id string, needNode, needPipelineRun bool) (*Pipe
 	return getPipelineByID(id, needNode, needPipelineRun)
 }
 
-func (f *Flow) UpdatePipeline(id string, topic string, remark string) error {
+func (f *Flow) UpdatePipelineTopic(id string, topic string) error {
 	return updatePipeline(id, map[string]interface{}{
-		"topic":  topic,
+		"topic": topic,
+	})
+}
+
+func (f *Flow) UpdatePipelineRemark(id, remark string) error {
+	return updatePipeline(id, map[string]interface{}{
 		"remark": remark,
 	})
 }
@@ -97,6 +102,38 @@ func (f *Flow) DeletePipeline(id string) error {
 
 	if err := deletePipeline(id); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (f *Flow) NewPipelineRun(args *PipelineRunArgs) error {
+	pipe, err := getPipelineByID(args.PipelineID, true, false)
+	if err != nil {
+		return err
+	}
+
+	if len(pipe.Node) == 0 {
+		return errors.New("pipeline has no node")
+	}
+
+	pipeRun := &PipelineRun{
+		PipelineID: pipe.ID,
+		Stage:      pipe.Node[0].ID,
+		Status:     PipelineRunStatusProcessing,
+	}
+	if err := createPipelineRun(pipeRun); err != nil {
+		return err
+	}
+
+	for _, node := range pipe.Node {
+		nodeRun := &NodeData{
+			PipelineRunID: pipeRun.ID,
+			NodeID:        node.ID,
+		}
+		if err := createNodeData(nodeRun); err != nil {
+			return err
+		}
 	}
 
 	return nil
