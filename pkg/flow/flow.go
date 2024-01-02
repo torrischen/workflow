@@ -11,7 +11,7 @@ type Flow struct {
 	delay time.Duration
 }
 
-func NewFlow(mysqlOpt *MysqlOption, opts ...FlowOption) *Flow {
+func NewFlow(storage *StorageOption, opts ...FlowOption) *Flow {
 	f := &Flow{
 		ctx: context.Background(),
 	}
@@ -20,11 +20,11 @@ func NewFlow(mysqlOpt *MysqlOption, opts ...FlowOption) *Flow {
 	}
 
 	initMysql(
-		mysqlOpt.User,
-		mysqlOpt.Password,
-		mysqlOpt.Host,
-		mysqlOpt.Port,
-		mysqlOpt.DbName,
+		storage.Mysql.User,
+		storage.Mysql.Password,
+		storage.Mysql.Host,
+		storage.Mysql.Port,
+		storage.Mysql.DbName,
 	)
 
 	return f

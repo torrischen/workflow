@@ -15,6 +15,18 @@ type MysqlOption struct {
 	DbName   string
 }
 
+type RedisOption struct {
+	Host     string
+	Port     string
+	Password string
+	Db       int
+}
+
+type StorageOption struct {
+	Mysql *MysqlOption
+	Redis *RedisOption
+}
+
 func WithContext(ctx context.Context) FlowOption {
 	return func(f *Flow) {
 		f.ctx = ctx
