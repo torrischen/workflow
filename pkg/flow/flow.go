@@ -69,3 +69,7 @@ func (f *Flow) NewPipeline(args *PipelineArgs) error {
 func (f *Flow) GetPipelineByID(id string, needNode, needPipelineRun bool) (*Pipeline, error) {
 	return getPipelineByID(id, needNode, needPipelineRun)
 }
+
+func (f *Flow) UpdatePipeline(id string, data map[string]interface{}) error {
+	return updatePipeline(id, data)
+}
