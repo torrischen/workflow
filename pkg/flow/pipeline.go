@@ -1,5 +1,7 @@
 package flow
 
+import "gorm.io/gorm"
+
 type Pipeline struct {
 	Base
 	Topic       string        `json:"topic"`
@@ -9,7 +11,7 @@ type Pipeline struct {
 	PipelineRun []PipelineRun `json:"pipeline_run"`
 }
 
-func CreatePipeline(pipeline *Pipeline) error {
+func createPipeline(pipeline *Pipeline) error {
 	if err := db.Create(pipeline).Error; err != nil {
 		return err
 	}
@@ -17,7 +19,7 @@ func CreatePipeline(pipeline *Pipeline) error {
 	return nil
 }
 
-func UpdatePipeline(id string, data map[string]interface{}) error {
+func updatePipeline(id string, data map[string]interface{}) error {
 	if err := db.Model(&Pipeline{}).Where("id = ?", id).Updates(data).Error; err != nil {
 		return err
 	}
@@ -25,7 +27,7 @@ func UpdatePipeline(id string, data map[string]interface{}) error {
 	return nil
 }
 
-func DeletePipeline(id string) error {
+func deletePipeline(id string) error {
 	if err := db.Delete(&Pipeline{}, id).Error; err != nil {
 		return err
 	}
@@ -33,9 +35,22 @@ func DeletePipeline(id string) error {
 	return nil
 }
 
-func GetPipelineByID(id string) (*Pipeline, error) {
+func getPipelineByID(id string, needNode, needPipelineRun bool) (*Pipeline, error) {
 	var pipeline Pipeline
-	if err := db.Preload("Node").Preload("PipelineRun").First(&pipeline, id).Error; err != nil {
+
+	_db := db
+	if needNode {
+		_db = _db.Preload("Node", func(db *gorm.DB) *gorm.DB {
+			return db.Order("sequence asc")
+		})
+	}
+	if needPipelineRun {
+		_db = _db.Preload("PipelineRun")
+	}
+
+	if err := _db.
+		Where("id=?", id).
+		First(&pipeline).Error; err != nil {
 		return nil, err
 	}
 

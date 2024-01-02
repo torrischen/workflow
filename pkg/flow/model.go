@@ -2,6 +2,7 @@ package flow
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/torrischen/workflow/logging"
 	"github.com/torrischen/workflow/pkg/util"
@@ -40,6 +41,12 @@ func initMysql(user, password, host, port, dbname string) {
 func addUUID(db *gorm.DB) {
 	if _, ok := db.Statement.Schema.FieldsByName["ID"]; ok {
 		db.Statement.SetColumn("ID", util.Uuid())
+	}
+}
+
+func addCreatedAt(db *gorm.DB) {
+	if _, ok := db.Statement.Schema.FieldsByName["CreatedAt"]; ok {
+		db.Statement.SetColumn("CreatedAt", time.Now().Unix())
 	}
 }
 

@@ -9,7 +9,7 @@ type NodeData struct {
 	PipelineRun   *PipelineRun `json:"pipeline_run"`
 }
 
-func CreateNodeData(nodeData *NodeData) error {
+func createNodeData(nodeData *NodeData) error {
 	if err := db.Create(nodeData).Error; err != nil {
 		return err
 	}
@@ -17,7 +17,7 @@ func CreateNodeData(nodeData *NodeData) error {
 	return nil
 }
 
-func UpdateNodeData(id string, data map[string]interface{}) error {
+func updateNodeData(id string, data map[string]interface{}) error {
 	if err := db.Model(&NodeData{}).Where("id = ?", id).Updates(data).Error; err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func UpdateNodeData(id string, data map[string]interface{}) error {
 	return nil
 }
 
-func DeleteNodeData(id string) error {
+func deleteNodeData(id string) error {
 	if err := db.Delete(&NodeData{}, id).Error; err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func DeleteNodeData(id string) error {
 	return nil
 }
 
-func GetNodeDataByID(id string) (*NodeData, error) {
+func getNodeDataByID(id string) (*NodeData, error) {
 	var nodeData NodeData
 	if err := db.Preload("PipelineRun").Preload("Node").First(&nodeData, id).Error; err != nil {
 		return nil, err

@@ -16,7 +16,7 @@ type PipelineRun struct {
 	NodeData   []NodeData `json:"node_data"`
 }
 
-func CreatePipelineRun(pipelineRun *PipelineRun) error {
+func createPipelineRun(pipelineRun *PipelineRun) error {
 	if err := db.Create(pipelineRun).Error; err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func CreatePipelineRun(pipelineRun *PipelineRun) error {
 	return nil
 }
 
-func UpdatePipelineRun(id string, data map[string]interface{}) error {
+func updatePipelineRun(id string, data map[string]interface{}) error {
 	if err := db.Model(&PipelineRun{}).Where("id = ?", id).Updates(data).Error; err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func UpdatePipelineRun(id string, data map[string]interface{}) error {
 	return nil
 }
 
-func DeletePipelineRun(id string) error {
+func deletePipelineRun(id string) error {
 	if err := db.Delete(&PipelineRun{}, id).Error; err != nil {
 		return err
 	}
@@ -40,9 +40,12 @@ func DeletePipelineRun(id string) error {
 	return nil
 }
 
-func GetPipelineRunByID(id string) (*PipelineRun, error) {
+func getPipelineRunByID(id string) (*PipelineRun, error) {
 	var pipelineRun PipelineRun
-	if err := db.Preload("Pipeline").Preload("NodeData").First(&pipelineRun, id).Error; err != nil {
+	if err := db.
+		Preload("Pipeline").
+		Preload("NodeData").
+		First(&pipelineRun, id).Error; err != nil {
 		return nil, err
 	}
 
